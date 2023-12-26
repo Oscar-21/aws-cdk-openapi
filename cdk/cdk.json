@@ -25,9 +25,9 @@
       "aws",
       "aws-cn"
     ],
-    "RepositoryString": "lukepopp/aws-blog-openapi-cdkv2",
+    "RepositoryString": "Oscar-21/aws-cdk-openapi",
     "RepositoryBranch": "main",
-    "CodestarConnectionArn": "arn:aws:codestar-connections:ap-southeast-2:067566784356:connection/27053bd0-ce64-4c0b-9381-e31475918dfa",
+    "CodestarConnectionArn": "arn:aws:codestar-connections:us-east-1:815796776760:connection/bd3ebfd1-817f-4f68-a86b-5bfff42dcc44",
     "CodeArtifactDomain": "openapiblog",
     "CodeArtifactRepository": "openapiblog"
   }
