@@ -47,7 +47,7 @@ public class PipelineStack extends Stack {
 		// https://aws.amazon.com/blogs/devops/reducing-docker-image-build-time-on-aws-codebuild-using-an-external-cache/
 		ShellStep synthStep = ShellStep.Builder.create("Synth")
 				.input(pipelineSource)
-				.commands(Arrays.asList("npm install -g aws-cdk@2.19.0", "cd cdk", "cdk synth"))
+				.commands(Arrays.asList("npm install -g aws-cdk", "cd cdk", "cdk synth"))
 				.primaryOutputDirectory("cdk/cdk.out")
 				.build();
 
