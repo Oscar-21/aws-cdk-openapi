@@ -27,7 +27,7 @@ public class WidgetResource {
 	public Response ping() {
 		logger.info("Ping invoked..");
 
-		return Response.ok().entity("Pong...").build();
+		return Response.ok().entity("Pongz...").build();
 	}
 
 	@GET
@@ -37,9 +37,9 @@ public class WidgetResource {
 
 		List<Widget> widgets = new ArrayList<Widget>();
 
-		Widget widget1 = new Widget(1, "Widget 1", "The first Widget");
-		Widget widget2 = new Widget(2, "Widget 2", "The second Widget");
-		Widget widget3 = new Widget(3, "Widget 3", "The third Widget");
+		Widget widget1 = new Widget(1, "Widget 1", "The first Widget", true);
+		Widget widget2 = new Widget(2, "Widget 2", "The second Widget", false);
+		Widget widget3 = new Widget(3, "Widget 3", "The third Widget", true);
 
 		widgets.add(widget1);
 		widgets.add(widget2);
@@ -63,11 +63,11 @@ public class WidgetResource {
 		logger.info("getWidget {}", widgetId);
 
 		if (widgetId == 1) {
-			return Response.ok().entity(new Widget(1, "Widget 1", "The first Widget")).build();
+			return Response.ok().entity(new Widget(1, "Widget 1", "The first Widget", true)).build();
 		} else if (widgetId == 2) {
-			return Response.ok().entity(new Widget(2, "Widget 2", "The second Widget")).build();
+			return Response.ok().entity(new Widget(2, "Widget 2", "The second Widget", true)).build();
 		} else if (widgetId == 3) {
-			return Response.ok().entity(new Widget(3, "Widget 3", "The third Widget")).build();
+			return Response.ok().entity(new Widget(3, "Widget 3", "The third Widget", true)).build();
 		}
 
 		return Response.status(Response.Status.NOT_FOUND).build();

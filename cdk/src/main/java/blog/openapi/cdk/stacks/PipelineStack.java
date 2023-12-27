@@ -118,6 +118,9 @@ public class PipelineStack extends Stack {
 						"cd client",
 						"mvn -version",
 						// mvn --no-transfer-progress for mvn >= 3.6.1
+                        // "mvn clean install"
+                        // "mvn javadoc:javadoc"
+                        // "cd target/site"
 						"mvn --no-transfer-progress deploy -DaltDeploymentRepository=openapi--prod::default::$REPOSITORY_ENDPOINT"))
 				.rolePolicyStatements(Arrays.asList(codeArtifactStatement, codeArtifactStsStatement))
 				.env(new HashMap<String, String>() {

@@ -1,7 +1,7 @@
 openapi: 3.0.0
 servers: []
 info:
-  version: "1.0.0"
+  version: "1.0.1"
   title: Widgets API
   description: >-
     This is the Widgets API where you can create, find, and update Widgets.
@@ -142,8 +142,11 @@ components:
           type: string
         description:
           type: string
+        isActive:
+          type: boolean
       required:
         - id
         - name
         - description
+        - isActive
           

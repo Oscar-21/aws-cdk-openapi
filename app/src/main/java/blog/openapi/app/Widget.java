@@ -8,15 +8,17 @@ public class Widget {
 	private Integer id;
 	private String name;
 	private String description;
+	private Boolean isActive;
 
 	public Widget() {
 
 	}
 
-	public Widget(Integer id, String name, String description) {
+	public Widget(Integer id, String name, String description, Boolean isActive) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
+		this.isActive = isActive;
 	}
 
 	public Integer getId() {
@@ -41,6 +43,14 @@ public class Widget {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+	
+	public Boolean getIsActive() {
+		return isActive;
 	}
 
 	@Override

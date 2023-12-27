@@ -13,7 +13,7 @@ public class WidgetTest {
     public void testJaxrs() {
         RestAssured.when().get("/ping").then()
                 .contentType("text/plain")
-                .body(equalTo("Pong..."));
+                .body(equalTo("Pongz..."));
     }
 
 }
