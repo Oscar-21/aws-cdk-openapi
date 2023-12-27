@@ -6,13 +6,9 @@ RUN apk update \
     && apk add --update nodejs npm \
     && apk add --no-cache build-base
 
-# Install node packages and gems
-RUN npm install -g widdershins \
-    && gem install bundler 
+# Install node packages
+RUN npm i -g @redocly/cli@latest
 
 # working directory
 WORKDIR /openapi
 
-RUN git clone https://github.com/slatedocs/slate
-RUN cd slate \
-    && bundle install
