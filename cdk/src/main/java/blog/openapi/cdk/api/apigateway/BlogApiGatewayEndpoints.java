@@ -3,6 +3,7 @@ package blog.openapi.cdk.api.apigateway;
 import java.util.HashMap;
 import java.util.Map;
 
+import blog.openapi.cdk.stacks.ApiStack;
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.Fn;
 import software.amazon.awscdk.IResolvable;
@@ -15,7 +16,7 @@ import software.amazon.awscdk.services.s3.assets.Asset;
 
 public class BlogApiGatewayEndpoints {
 
-	public CfnOutput build(Stack stack, String stage) {
+	public void build(ApiStack stack) {
 		Asset openAPIAsset = Asset.Builder.create(stack, "OpenAPIBlogAsset")
 				.path("../api/openapi.yaml").build();
 
@@ -31,16 +32,16 @@ public class BlogApiGatewayEndpoints {
 				.apiDefinition(apiDefinition)
 				.restApiName("OpenAPIBlogWidgetAPI")
 				.endpointExportName("OpenAPIBlogWidgetRestApiEndpoint")
-				.deployOptions(StageOptions.builder().stageName(stage).build())
+				.deployOptions(StageOptions.builder().stageName(stack.getStage()).build())
 				.deploy(true)
 				.build();
 
 		/**
 		 * This will be the endpoint used to access the documentation.
 		 */
-		return CfnOutput.Builder.create(stack, "OpenAPIBlogAPIRestIdOutput")
+		stack.setRestIdOutput(CfnOutput.Builder.create(stack, "OpenAPIBlogAPIRestIdOutput")
 				.value(restAPI.getRestApiId())
-				.build();
+				.build());
 
 	
 	}

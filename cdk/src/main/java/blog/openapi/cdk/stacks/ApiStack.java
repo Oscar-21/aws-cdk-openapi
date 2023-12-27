@@ -62,7 +62,7 @@ public class ApiStack extends Stack {
 		//                                                                //
 		///////////////////////////////////////////////////////////////////
 		BlogApiGatewayEndpoints apiGatewayEndpoints = new BlogApiGatewayEndpoints();
-		apiGatewayEndpoints.build(this, stage);
+		apiGatewayEndpoints.build(this);
 		
 		////////////////////////////////////////////////////////////////////
 		//                                                                //
@@ -76,6 +76,10 @@ public class ApiStack extends Stack {
 	
 	public String getStage() {
 		return stage;
+	}
+	
+	public void setRestIdOutput(CfnOutput restIdOutput) {
+		this.restIdOutput = restIdOutput;
 	}
 	
 	public void setBucketNameOutput(CfnOutput output) {
