@@ -2,7 +2,7 @@ openapi: 3.0.0
 servers: []
 info:
   version: "1.0.1"
-  title: Widgets API
+  title: Widgets API Title
   description: >-
     This is the Widgets API where you can create, find, and update Widgets.
 externalDocs:
