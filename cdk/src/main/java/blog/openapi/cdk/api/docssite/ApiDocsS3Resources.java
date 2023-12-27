@@ -54,10 +54,10 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 		List<String> apiDocPackagingInstructions = Arrays.asList(
 				"/bin/sh", "-c",
 				"pwd && ls -l && " +
-						"redocly build-docs /openapi/openapi.yaml --output=/openapi/index.html && "
+						"redocly build-docs openapi.yaml --output=index.html && "
 						+
 						"ls -la && " +
-						"cp /openapi/index.html /asset-output/");
+						"cp index.html /asset-output/");
 
 		BundlingOptions.Builder apiDocBuilderOptions = BundlingOptions.builder().command(defaultApiPackagingInstructions)
 				.image(apDocImage)
