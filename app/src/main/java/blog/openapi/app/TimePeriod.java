@@ -6,13 +6,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class TimePeriod {
   private MonthYearSelection start;
   private MonthYearSelection end;
+
   public TimePeriod() {
 
   }
 
-  public TimePeriod(
-      MonthYearSelection start,
-      MonthYearSelection end) {
+  public TimePeriod(MonthYearSelection start, MonthYearSelection end) {
     this.start = start;
     this.end = end;
   }
@@ -40,9 +39,6 @@ public class TimePeriod {
 
   @Override
   public String toString() {
-    return "TimePeriod{" +
-        "start=" + start +
-        ", end=" + end +
-        '}';
+    return "TimePeriod{" + "start=" + start + ", end=" + end + '}';
   }
 }

@@ -12,10 +12,7 @@ public class AwsAccountCostForPeriod {
 
   public AwsAccountCostForPeriod() {}
 
-  public AwsAccountCostForPeriod(
-      String accountId,
-      String name,
-      Double cost,
+  public AwsAccountCostForPeriod(String accountId, String name, Double cost,
       TimePeriod timePeriod) {
     this.accountId = accountId;
     this.name = name;

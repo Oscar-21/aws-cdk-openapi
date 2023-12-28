@@ -9,14 +9,13 @@ public class AwsAccountCostsForAllAccounts {
   private Set<AwsAccountCostForPeriod> internal;
   private Set<AwsAccountCostForPeriod> external;
   private TimePeriod timePeriod;
+
   public AwsAccountCostsForAllAccounts() {
 
   }
 
-  public AwsAccountCostsForAllAccounts(
-      Set<AwsAccountCostForPeriod> internal,
-      Set<AwsAccountCostForPeriod> external,
-      TimePeriod timePeriod) {
+  public AwsAccountCostsForAllAccounts(Set<AwsAccountCostForPeriod> internal,
+      Set<AwsAccountCostForPeriod> external, TimePeriod timePeriod) {
     this.internal = internal;
     this.external = external;
     this.timePeriod = timePeriod;
