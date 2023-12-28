@@ -1,30 +1,41 @@
 openapi: 3.0.0
-servers: []
 info:
-  version: "1.0.1"
-  title: Widgets API Title
+  version: "1.0.2"
+  title: Nymbl AWS Costs API
   description: >-
-    This is the Widgets API where you can create, find, and update Widgets.
-externalDocs:
-  description: Widgets API Git repository
-  url: https://gitlab.aws/lppopple/blog/cdk-openapi/widgets-api
-tags:
-  - name: widget
-    description: Everything about Widgets
-    externalDocs:
-      description: Amazon Web Services
-      url: 'http://aws.amazon.com'
+    You can use this API to get an aggregation of the internal and external account costs
+    for Nymbl's AWS Accounts.
+#externalDocs:
+#  description: Nymbl AWS Costs API Git repository
+#  url: TODO
 paths:
-  /widgets:
+  /cost/accounts:
     get: 
-      tags:
-        - widget
-      summary: Widget List.
-      description: Get list of Widgets.
-      operationId: getWidgets
+      summary: Get AWSCostsByAllAccounts.
+      description: Costs for all aws accounts, separated by internal and external accounts.
+      operationId: getAWSCostsByAllAccounts
+      parameters:
+        - name: start
+          in: query
+          description: The start and end date for which you want cost data.
+          required: false
+          schema:
+            type: string
+            format: date
+            description: start date in YYYY-MM format
+            example: 2023-04
+        - name: end
+          in: query
+          description: The start and end date for which you want cost data.
+          required: false
+          schema:
+            type: string
+            format: date
+            description: start date in YYYY-MM format
+            example: 2023-05
       responses:
         '200':
-          $ref: '#/components/responses/Widgets'
+          $ref: '#/components/responses/AwsCostsByAllAccounts'
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}/invocations"
@@ -32,53 +43,18 @@ paths:
         httpMethod: "POST"
         type: "aws_proxy"
     post:
-      tags:
-        - widget
-      summary: Create Widget.
-      description: Create a Widget.
-      operationId: createWidget
+      summary: Create Aws Account Cost Records for a single month
+      description: >-
+        Endpoint to be used by dynamodb to cache the cost explorer api requests.
+        Since the API is quite expensive, we update the data monthly and expose the
+        stored data via the '/cost/accounts' endpoint.
+      operationId: createSingleMonthAwsAccountCostRecord
       requestBody:
-        $ref: '#/components/requestBodies/Widget'
+
+        "$ref": "#/components/requestBodies/AwsOneMonthSingleAccountCosts"
       responses:
         '201':
           description: Created
-      x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}/invocations"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        type: "aws_proxy"
-  /widgets/{widgetID}:
-    get:
-      tags:
-        - widget
-      summary: Get Widget.
-      description: Get a Widget.
-      operationId: getWidget
-      parameters:
-        - $ref: '#/components/parameters/WidgetID'
-      responses:
-        '200':
-          $ref: '#/components/responses/Widget'
-      x-amazon-apigateway-integration:
-        uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}/invocations"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "POST"
-        type: "aws_proxy"
-    put:
-      tags:
-        - widget
-      summary: Update Widget.
-      description: Update a Widget.
-      operationId: updateWidget
-      parameters:
-        - $ref: '#/components/parameters/WidgetID'
-      requestBody:
-        $ref: '#/components/requestBodies/Widget'
-      responses:
-        '204':
-          description: Updated
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}/invocations"
@@ -102,51 +78,300 @@ paths:
         type: "aws_proxy"
 
 components:
-  parameters:
-    WidgetID:
-      in: path
-      name: widgetID
-      required: true
-      schema:
-        type: number
   requestBodies:
-    Widget:
-      description: Represents a Widget creation.
-      required: true
+    AwsOneMonthSingleAccountCosts:
+      description: A list of single accounts and their cost for a single month/year combination.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Widget'
+            $ref: '#/components/schemas/AwsSingleAccountCostsRequest'
   responses:
-    Widgets:
+    AwsCostsByAllAccounts:
       description: OK
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Widget'
-    Widget:
-      description: OK
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Widget'
+            $ref: '#/components/schemas/AwsCostsByAllAccounts'
   schemas:
-    Widget:
+
+    DateSelectionYearRequired:
       type: object
       properties:
-        id:
-          type: number
+        year:
+          type: integer
+          minimum: 2023
+          example: 2023
+        month:
+          type: string
+          enum:
+            - JANUARY
+            - FEBRUARY
+            - MARCH
+            - APRIL
+            - MAY
+            - JUNE
+            - JULY
+            - AUGUST
+            - SEPTEMBER
+            - OCTOBER
+            - NOVEMBER
+            - DECEMBER
+          example: FEBRUARY
+      example:
+        year: 2023
+      required:
+        - year
+
+    DateSelectionMonthAndYearRequired:
+      type: object
+      properties:
+        year:
+          type: integer
+          minimum: 2023
+          example: 2024
+        month:
+          type: string
+          example: FEBRUARY
+          enum:
+            - JANUARY
+            - FEBRUARY
+            - MARCH
+            - APRIL
+            - MAY
+            - JUNE
+            - JULY
+            - AUGUST
+            - SEPTEMBER
+            - OCTOBER
+            - NOVEMBER
+            - DECEMBER
+      example:
+        year: 2024
+        month: NOVEMBER
+      required:
+        - year
+        - month
+
+    TimePeriodOnlyStartRequired:
+      type: object
+      properties:
+        start:
+          $ref: '#/components/schemas/DateSelectionYearRequired'
+          example:
+            month: JUNE
+            year: 2023
+        end:
+          $ref: '#/components/schemas/DateSelectionYearRequired'
+          example:
+            month: JULY
+            year: 2023
+      required:
+        - start
+      example:
+        start:
+          year: 2023
+
+    TimePeriodStartAndEndRequired:
+      type: object
+      properties:
+        start:
+          $ref: '#/components/schemas/DateSelectionYearRequired'
+        end:
+          $ref: '#/components/schemas/DateSelectionYearRequired'
+      required:
+        - start
+        - end
+      example:
+        start:
+          year: 2023
+        end:
+          year: 2024
+          month: APRIL
+
+
+    AwsSingleAccountCost:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: "123456789012"
         name:
           type: string
-        description:
-          type: string
-        isActive:
-          type: boolean
+          example: "Acme Inc"
+        cost:
+          type: number
+          example: 344.55
+        timePeriod:
+          $ref: '#/components/schemas/TimePeriodStartAndEndRequired'
+          example:
+            start:
+              year: 2023,
+              month: OCTOBER
+            end:
+              year: 2023,
+              month: NOVEMBER
       required:
-        - id
+        - accountId
         - name
-        - description
-        - isActive
-          
+        - cost
+        - timePeriod
+      example: {
+        "accountId": "1234567",
+        "name": "Foo",
+        "cost": 33.21,
+        "timePeriod": {
+          "start": {
+            "year": 2023,
+            "month": "OCTOBER"
+          },
+          "end": {
+            "year": 2023,
+            "month": "NOVEMBER"
+          }
+        }
+      }
+
+    AwsSingleAccountCostWithoutTimePeriod:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: 123456789012
+        name:
+          type: string
+          example: Nymbl
+        cost:
+          type: number
+          example: 3214.32
+      required:
+        - accountId
+        - name
+        - cost
+      example: {
+        "accountId": "1234567",
+        "name": "Foo",
+        "cost": 33.21,
+      }
+
+    AwsSingleAccountCostsRequest:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AwsSingleAccountCostWithoutTimePeriod'
+          uniqueItems: true
+        monthYearSelection:
+          $ref: '#/components/schemas/DateSelectionMonthAndYearRequired'
+      example: {
+        "accounts": [
+          {
+            "accountId": "1234567",
+            "name": "Foo",
+            "cost": 33.21,
+          },
+          {
+            "accountId": "1234567",
+            "name": "Foo",
+            "cost": 33.21,
+          }
+        ],
+        "monthYearSelection": {
+          "year": 2023,
+          "month": "OCTOBER"
+        }
+      }
+
+    AwsSingleAccountCostList:
+      type: array
+      items:
+        $ref: '#/components/schemas/AwsSingleAccountCost'
+      uniqueItems: true
+      example: [
+        {
+          "accountId": "1234567",
+          "name": "Foo",
+          "cost": 33.21,
+          "timePeriod": {
+            "start": {
+              "year": 2023,
+              "month": "OCTOBER"
+            },
+            "end": {
+              "year": 2023,
+              "month": "NOVEMBER"
+            }
+          }
+        },
+        {
+          "accountId": "1234567373879",
+          "name": "Bar",
+          "cost": 1113.21,
+          "timePeriod": {
+            "start": {
+              "year": 2023,
+              "month": "OCTOBER"
+            },
+            "end": {
+              "year": 2023,
+              "month": "NOVEMBER"
+            }
+          }
+        }
+      ]
+
+    AwsCostsByAllAccounts:
+      type: object
+      properties:
+        timePeriod:
+          $ref: '#/components/schemas/TimePeriodOnlyStartRequired'
+        internal:
+          $ref: '#/components/schemas/AwsSingleAccountCostList'
+        external:
+          $ref: '#/components/schemas/AwsSingleAccountCostList'
+      example:
+        timePeriod:
+          start:
+            year: 2023
+        internal:
+          - accountId: '1234567'
+            name: Foo
+            cost: 33.21
+            timePeriod:
+              start:
+                year: 2023
+                month: OCTOBER
+              end:
+                year: 2023
+                month: NOVEMBER
+          - accountId: '13389343987'
+            name: Bar
+            cost: 822.21
+            timePeriod:
+              start:
+                year: 2023
+                month: OCTOBER
+              end:
+                year: 2023
+                month: NOVEMBER
+        external:
+          - accountId: '1234567'
+            name: SomeOtherAccount
+            cost: 33.21
+            timePeriod:
+              start:
+                year: 2023
+                month: OCTOBER
+              end:
+                year: 2023
+                month: NOVEMBER
+          - accountId: '13389343987'
+            name: ExternalAccountBar
+            cost: 822.21
+            timePeriod:
+              start:
+                year: 2023
+                month: OCTOBER
+              end:
+                year: 2023
+                month: NOVEMBER

@@ -13,8 +13,6 @@ public class CdkApp {
         String codeArtifactDomain = app.getNode().tryGetContext("CodeArtifactDomain").toString();
         String codeArtifactRepository = app.getNode().tryGetContext("CodeArtifactRepository").toString();
 
-        // new ApiStack(app,"OpenAPIBlogAPIStack", "DEV", StackProps.builder().build());
-
         new PipelineStack(app, "OpenAPIBlogPipeline", repositoryString, repositoryBranch, codestarConnectionArn,
                 codeArtifactRepository, codeArtifactDomain);
 

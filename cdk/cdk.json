@@ -22,8 +22,7 @@
     "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true,
     "@aws-cdk/aws-iam:minimizePolicies": true,
     "@aws-cdk/core:target-partitions": [
-      "aws",
-      "aws-cn"
+      "aws"
     ],
     "RepositoryString": "Oscar-21/aws-cdk-openapi",
     "RepositoryBranch": "main",

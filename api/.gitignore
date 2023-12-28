@@ -1,3 +1,5 @@
 *.jar
 *.html
 .project
+.*.iml
+.idea

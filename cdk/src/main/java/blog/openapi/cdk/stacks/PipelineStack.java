@@ -1,8 +1,11 @@
 package blog.openapi.cdk.stacks;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
+import software.amazon.awscdk.services.codebuild.Cache;
+import software.amazon.awscdk.services.codebuild.LocalCacheMode;
 import software.constructs.Construct;
 import software.amazon.awscdk.Arn;
 import software.amazon.awscdk.ArnComponents;
@@ -34,6 +37,14 @@ public class PipelineStack extends Stack {
 
 		super(scope, id, props);
 
+		/*
+		 *
+		 * CodePipelineSource.connection(...):
+		 * This is creating a pipeline source from a repository.
+		 *
+		 * The repositoryPath and repositoryBranch parameters specify the repository and branch to use.
+		 * The connectionArn parameter specifies the ARN of the AWS CodeStar Connections connection.
+ 		 */
 		CodePipelineSource pipelineSource = CodePipelineSource.connection(repositoryPath, repositoryBrach,
 				ConnectionSourceOptions.builder()
 						.connectionArn(connectionArn)
@@ -45,17 +56,52 @@ public class PipelineStack extends Stack {
 		// https://aws.amazon.com/blogs/devops/how-to-enable-caching-for-aws-codebuild/
 		// https://docs.aws.amazon.com/codebuild/latest/userguide/build-caching.html
 		// https://aws.amazon.com/blogs/devops/reducing-docker-image-build-time-on-aws-codebuild-using-an-external-cache/
+
+		/*
+		 * ShellStep.Builder.create(...):
+		 * This is creating a synthesis step.
+		 * The synthesis step is where your CDK application
+		 * is synthesized (i.e., compiled) into a CloudFormation template.
+		 */
 		ShellStep synthStep = ShellStep.Builder.create("Synth")
+				// This is specifying the input to the synthesis step.
+				// The input is the pipeline source that was created earlier.
 				.input(pipelineSource)
+				// These are the commands that will be run during the synthesis step.
+				// These commands are installing the AWS CDK,
+				// changing the current directory to the cdk directory,
+				// and synthesizing the CDK application.
 				.commands(Arrays.asList("npm install -g aws-cdk", "cd cdk", "cdk synth"))
+				// This is specifying the primary output directory for the synthesis step.
+				// The contents of this directory after the synthesis step will be the primary output of the step.
 				.primaryOutputDirectory("cdk/cdk.out")
 				.build();
+		//
 
+		// This code is creating an AWS CDK pipeline using the CodePipeline.Builder.create.
+		// This initializes a new instance of the CodePipeline class with the
+		// current construct (this) and the ID OpenAPIBlogPipeline.
 		final CodePipeline pipeline = CodePipeline.Builder.create(this, "OpenAPIBlogPipeline")
+				// This sets the name of the pipeline to OpenAPIBlogPipeline.
 				.pipelineName("OpenAPIBlogPipeline")
+				// This enables self-mutation for the pipeline.
+				// Self-mutation means that the pipeline can update itself when changes
+				// are made to the pipeline’s infrastructure.
 				.selfMutation(true)
+				// This enables Docker for the synthesis step.
+				// The synthesis step is where your CDK application is synthesized (i.e., compiled)
+				// into a CloudFormation template.
+				// If Docker is enabled, the commands in the synthesis step will be run inside a Docker container.
 				.dockerEnabledForSynth(true)
+				// This sets the synthesis step for the pipeline.
+				// The synthStep parameter is a ShellStep that was created earlier,
+				// which specifies the commands to run during the synthesis step.
 				.synth(synthStep)
+				// This builds the pipeline.
+				// After this method is called, the pipeline is fully constructed and ready to be used.
+				// this code is setting up an AWS CDK pipeline with a specific name, enabling self-mutation
+				// and Docker for the synthesis step, setting the synthesis step, and building the pipeline.
+				// The pipeline can then be used to deploy AWS CDK applications.
 				.build();
 
 		PolicyStatement codeArtifactStatement = PolicyStatement.Builder.create()
@@ -129,12 +175,13 @@ public class PipelineStack extends Stack {
 						put("REPOSITORY_NAME", codeArtifactRepositoryName);
 					}
 				})
+				.cache(Cache.local(LocalCacheMode.DOCKER_LAYER))
 				.build();
 
 		ApiStackStage apiStackStageDev = new ApiStackStage(this, "DEV", StageProps.builder().build());
 		pipeline.addStage(apiStackStageDev,
 				AddStageOpts.builder()
-						.post(Arrays.asList(codeArtifactStep))
+						.post(Collections.singletonList(codeArtifactStep))
 						.build());
 
 	}
