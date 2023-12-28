@@ -13,28 +13,31 @@ servers:
 paths:
   /cost/accounts:
     options:
+      responses:
+        '200':
+          description: CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
       x-amazon-apigateway-integration:
         type: mock
         requestTemplates:
           application/json: '{"statusCode": 200}'
         responses:
           default:
-            statusCode: 200
+            statusCode: '200'
             responseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,X-Api-Key'"
-              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-            responseTemplates:
-              application/json: ''
-      methodResponses:
-        - statusCode: 200
-          responseModels:
-            application/json: 'Empty'
-          responseParameters:
-            method.response.header.Access-Control-Allow-Headers: false
-            method.response.header.Access-Control-Allow-Methods: false
-            method.response.header.Access-Control-Allow-Origin: false
-            
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          
     get: 
       summary: Get AWSCostsByAllAccounts.
       description: Costs for all aws accounts, separated by internal and external accounts.
@@ -87,27 +90,30 @@ paths:
         type: "aws_proxy"
   /ping:
     options:
+      responses:
+        '200':
+          description: CORS support
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
       x-amazon-apigateway-integration:
         type: mock
         requestTemplates:
           application/json: '{"statusCode": 200}'
         responses:
           default:
-            statusCode: 200
+            statusCode: '200'
             responseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,X-Api-Key'"
-              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
-            responseTemplates:
-              application/json: ''
-      methodResponses:
-        - statusCode: 200
-          responseModels:
-            application/json: 'Empty'
-          responseParameters:
-            method.response.header.Access-Control-Allow-Headers: false
-            method.response.header.Access-Control-Allow-Methods: false
-            method.response.header.Access-Control-Allow-Origin: false
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,GET,PUT,POST,DELETE,PATCH'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     get:
       summary: Server heartbeat operation
       description: >-
