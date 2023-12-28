@@ -14,6 +14,9 @@ public abstract class AbstractCustomLambdaRuntime<T extends Stack> {
 	 */
 	protected static List<String> defaultApiPackagingInstructions = Arrays.asList("/bin/sh", "-c", "pwd && ls -l && "
 			+ "mvn --no-transfer-progress clean package && " + "cp target/function.zip /asset-output/");
+	
+	protected static List<String> nativePackagingInstructions = Arrays.asList("/bin/sh", "-c", "pwd && ls -l && "
+			+ "mvn clean install -Dnative -DskipTests -Dquarkus.native.container-build=true && " + "cp target/function.zip /asset-output/");
 
 	public abstract void buildImage(T stack);
 
