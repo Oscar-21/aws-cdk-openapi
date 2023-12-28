@@ -79,14 +79,16 @@ public class BlogApiGatewayEndpoints {
 		SpecRestApi restAPI = SpecRestApi.Builder.create(stack, "OpenAPIBlogRestAPI").apiDefinition(apiDefinition)
 				.restApiName("OpenAPIBlogWidgetAPI")
 				.endpointExportName("OpenAPIBlogWidgetRestApiEndpoint")
+				.domainName(domainNameOptions)
 				.deployOptions(StageOptions.builder().stageName(stack.getStage()).build()).deploy(true).build();
 		
 	
-		 ARecord.Builder.create(stack, "apiDNS")
+		 ARecord aRecord = ARecord.Builder.create(stack, "apiDNS")
 		 	.zone(hostedZone)
 		 	.recordName("openapiblog")
 		 	.target(RecordTarget.fromAlias(new ApiGateway(restAPI)))
 		 	.build();
+		 
 		 
 //		 restAPI.addDomainName("apiDNS", domainNameOptions);
 
