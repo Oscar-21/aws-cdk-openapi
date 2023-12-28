@@ -5,8 +5,6 @@ info:
   description: >-
     You can use this API to get an aggregation of the internal and external account costs
     for Nymbl's AWS Accounts.
-servers:
-  - description: Aws Api Gateway Endpoint for API
 #externalDocs:
 #  description: Nymbl AWS Costs API Git repository
 #  url: TODO
