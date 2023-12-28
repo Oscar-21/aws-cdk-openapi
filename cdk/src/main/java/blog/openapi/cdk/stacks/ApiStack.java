@@ -9,8 +9,30 @@ import software.constructs.Construct;
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.Stack;
 import software.amazon.awscdk.StackProps;
+import software.amazon.awscdk.services.route53.IHostedZone;
 
 public class ApiStack extends Stack {
+
+	public static class LogicalIds {
+		public static class APIGatewayResources {
+			public static String ImportedHostedZone = "ImportedHostedZone";
+			public static String APIGatewayCertificate = "APIGatewayCertificate";
+			public static String OpenAPIBlogAsset = "OpenAPIBlogAsset";
+			public static String OpenAPIBlogRestAPI = "OpenAPIBlogRestAPI";
+			public static String OpenAPIDNSForAPIGateway = "OpenAPIDNSForAPIGateway";
+		}
+
+		public static class APIGatewayLambdaResources {
+			public static String OpenAPIBlogLambda = "OpenAPIBlogLambda";
+			public static String APILambda = "APILambda";
+		}
+
+		public static class ApiDocsBucketAndCloudFrontDistributionResources {
+			public static String OpenAPIBlogAPIBucket = "OpenAPIBlogAPIBucket";
+		}
+
+
+	}
 
 	private CfnOutput restIdOutput;
 
@@ -20,6 +42,15 @@ public class ApiStack extends Stack {
 
 	private CfnOutput cloudFrontDistributionIdOutput;
 	private final String stage;
+	private IHostedZone hostedZone;
+
+	public void setHostedZone(IHostedZone hostedZone) {
+		this.hostedZone = hostedZone;
+	}
+
+	public IHostedZone getHostedZone() {
+		return hostedZone;
+	}
 
 	public CfnOutput getRestIdOutput() {
 		return restIdOutput;

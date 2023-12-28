@@ -12,6 +12,22 @@ servers:
 #  url: TODO
 paths:
   /cost/accounts:
+    options:
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json:
+            statusCode: 200
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              gatewayresponse.header.Access-Control-Allow-Headers: Content-Type,X-Amz-Date,X-Api-Key
+              gatewayresponse.header.Access-Control-Allow-Methods: OPTIONS,POST,GET 
+              gatewayresponse.header.Access-Control-Allow-Origin: '*'
+            responseTemplates:
+              application/json:
+                statusCode: 200
     get: 
       summary: Get AWSCostsByAllAccounts.
       description: Costs for all aws accounts, separated by internal and external accounts.
@@ -52,8 +68,7 @@ paths:
         stored data via the '/cost/accounts' endpoint.
       operationId: createSingleMonthAwsAccountCostRecord
       requestBody:
-
-        "$ref": "#/components/requestBodies/AwsOneMonthSingleAccountCosts"
+        $ref: '#/components/requestBodies/AwsOneMonthSingleAccountCosts'
       responses:
         '201':
           description: Created
@@ -64,6 +79,22 @@ paths:
         httpMethod: "POST"
         type: "aws_proxy"
   /ping:
+    options:
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json:
+            statusCode: 200
+        responses:
+          default:
+            statusCode: 200
+            responseParameters:
+              gatewayresponse.header.Access-Control-Allow-Headers: Content-Type,X-Amz-Date,X-Api-Key
+              gatewayresponse.header.Access-Control-Allow-Methods: OPTIONS,POST,GET 
+              gatewayresponse.header.Access-Control-Allow-Origin: '*'
+            responseTemplates:
+              application/json:
+                statusCode: 200
     get:
       summary: Server heartbeat operation
       description: >-
