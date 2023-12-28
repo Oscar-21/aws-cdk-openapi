@@ -30,7 +30,7 @@ public class BlogLambda extends AbstractCustomLambdaRuntime<ApiStack> {
      * Additional configuration for the custom lambda docker container.
      */
     BundlingOptions.Builder apiBuilderOptions =
-        BundlingOptions.builder().command(nativePackagingInstructions)
+        BundlingOptions.builder().command(nativeBuildingInstructions)
             .image(software.amazon.awscdk.services.lambda.Runtime.PROVIDED_AL2.getBundlingImage())
             .user("root")
             .local(new ILocalBundling() {
