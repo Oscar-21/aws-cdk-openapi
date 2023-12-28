@@ -55,7 +55,7 @@ public class BlogApiGatewayEndpoints {
 		 Certificate certificate = Certificate.Builder.create(stack, "Certificate")
            .domainName("openapiblog.heoureialwed.com")
            .validation(CertificateValidation.fromDns(hostedZone))
-           .build();
+          .build();
 		 
 		DomainNameOptions domainNameOptions = DomainNameOptions.builder()
 							.domainName("openapiblog.heoureialwed.com")
@@ -78,7 +78,6 @@ public class BlogApiGatewayEndpoints {
 
 		SpecRestApi restAPI = SpecRestApi.Builder.create(stack, "OpenAPIBlogRestAPI").apiDefinition(apiDefinition)
 				.restApiName("OpenAPIBlogWidgetAPI")
-				.domainName(domainNameOptions)
 				.endpointExportName("OpenAPIBlogWidgetRestApiEndpoint")
 				.deployOptions(StageOptions.builder().stageName(stack.getStage()).build()).deploy(true).build();
 		
@@ -88,6 +87,8 @@ public class BlogApiGatewayEndpoints {
 		 	.recordName("openapiblog")
 		 	.target(RecordTarget.fromAlias(new ApiGateway(restAPI)))
 		 	.build();
+		 
+//		 restAPI.addDomainName("apiDNS", domainNameOptions);
 
 		/**
 		 * This will be the endpoint used to access the documentation.
