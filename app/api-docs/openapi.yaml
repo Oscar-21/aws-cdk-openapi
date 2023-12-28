@@ -7,7 +7,6 @@ info:
     for Nymbl's AWS Accounts.
 servers:
   - description: Aws Api Gateway Endpoint for API
-    url: { Fn::Sub: "https://${OpenAPIBlogRestAPI}.execute-api.${AWS::Region}.amazonaws.com/DEV" }
 #externalDocs:
 #  description: Nymbl AWS Costs API Git repository
 #  url: TODO
