@@ -17,7 +17,7 @@ public class ApiStack extends Stack {
     public static class DNS {
       public static String ROOT = "heoureialwed.com";
       public static String apiRecord = "openapiapi";
-      public static String docsRecord = "openapidocs";
+      public static String docsRecord = "heoureialwed.com";
     }
     public static class LogicalIds {
       public static String ImportedHostedZone = "ImportedHostedZone";
