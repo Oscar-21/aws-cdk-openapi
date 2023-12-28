@@ -73,7 +73,7 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 
     Bucket webBucket = Bucket.Builder.create(stack, ApiStack.Config.LogicalIds.OpenAPIBlogAPIBucket)
         .bucketName(PhysicalName.GENERATE_IF_NEEDED).versioned(true)
-        .encryption(BucketEncryption.UNENCRYPTED).autoDeleteObjects(true)
+        .encryption(BucketEncryption.S3_MANAGED).autoDeleteObjects(true)
         .removalPolicy(RemovalPolicy.DESTROY).build();
 
     OriginAccessIdentity oai = OriginAccessIdentity.Builder.create(stack, "OpenAPIBlogWidgetAPIOAI")
