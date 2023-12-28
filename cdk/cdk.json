@@ -28,6 +28,7 @@
     "RepositoryBranch": "main",
     "CodestarConnectionArn": "arn:aws:codestar-connections:us-east-1:815796776760:connection/bd3ebfd1-817f-4f68-a86b-5bfff42dcc44",
     "CodeArtifactDomain": "openapiblog",
-    "CodeArtifactRepository": "openapiblog"
+    "CodeArtifactRepository": "openapiblog",
+    "DeployEnvironment": "DEV"
   }
 }

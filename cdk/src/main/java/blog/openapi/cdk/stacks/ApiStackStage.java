@@ -11,11 +11,9 @@ public class ApiStackStage extends Stage {
 		this(scope, id, null);
 	}
 
-	public ApiStackStage(final Construct scope, final String id, final StageProps props) {
-		super(scope, id, props);
-
-		new ApiStack(this, "OpenAPIBlogAPI", id, StackProps.builder().build());
-
+	public ApiStackStage(final Construct scope, final String deployEnvironment, final StageProps props) {
+		super(scope, deployEnvironment, props);
+		new ApiStack(this, "OpenAPIBlogAPI", deployEnvironment, StackProps.builder().env(props.getEnv()).build());
 	}
 
 }

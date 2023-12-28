@@ -40,7 +40,7 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 		 * docker build -t openapidoc .
 		 * docker run -it openapidoc sh
 		 */
-		String entry = "../api/docker";
+		String entry = "../app/api-docs/docker";
 
 		// Alpine ruby docker image size = 532.12 MB
 		// Ruby slim docker image size = 829.31 MB
@@ -71,7 +71,7 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 				.user("root")
 				.outputType(BundlingOutput.NOT_ARCHIVED);
 
-		ISource apiDocSource = Source.asset("../api", AssetOptions.builder()
+		ISource apiDocSource = Source.asset("../app/api-docs", AssetOptions.builder()
 				.bundling(apiDocBuilderOptions.command(apiDocPackagingInstructions).build())
 				.build());
 
