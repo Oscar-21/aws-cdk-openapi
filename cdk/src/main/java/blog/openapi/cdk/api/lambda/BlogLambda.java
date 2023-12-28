@@ -62,7 +62,7 @@ public class BlogLambda extends AbstractCustomLambdaRuntime<ApiStack> {
 		 * Create a lambda cloudformation resource referencing the local docker image
 		 * that references the quarkus http lambda
 		 */
-		Function apiLambda = new Function(stack, ApiStack.LogicalIds.APIGatewayLambdaResources.OpenAPIBlogLambda,
+		Function apiLambda = new Function(stack, ApiStack.Config.LogicalIds.OpenAPIBlogLambda,
 				FunctionProps.builder()
 						.runtime(software.amazon.awscdk.services.lambda.Runtime.JAVA_11)
 						.code(apiCode)
@@ -82,7 +82,7 @@ public class BlogLambda extends AbstractCustomLambdaRuntime<ApiStack> {
 		 *     Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}/invocations"
 		 */
 		CfnFunction apiCfnFunction = (CfnFunction) apiLambda.getNode().getDefaultChild();
-		apiCfnFunction.overrideLogicalId(ApiStack.LogicalIds.APIGatewayLambdaResources.APILambda);
+		apiCfnFunction.overrideLogicalId(ApiStack.Config.LogicalIds.APILambda);
 		
 		/**
 		 * Set Permissions on the APILambda created in the previous code block

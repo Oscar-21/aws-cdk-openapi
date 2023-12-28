@@ -75,7 +75,7 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 						.build());
 
 		Bucket webBucket = Bucket.Builder.create(stack,
-				ApiStack.LogicalIds.ApiDocsBucketAndCloudFrontDistributionResources.OpenAPIBlogAPIBucket)
+				ApiStack.Config.LogicalIds.OpenAPIBlogAPIBucket)
 				.bucketName(PhysicalName.GENERATE_IF_NEEDED).versioned(true)
 				.encryption(BucketEncryption.UNENCRYPTED).autoDeleteObjects(true)
 				.removalPolicy(RemovalPolicy.DESTROY).build();
@@ -95,8 +95,8 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 				.build());
 
 		Certificate certificate = Certificate.Builder
-				.create(stack, ApiStack.LogicalIds.APIGatewayResources.APIGatewayCertificate)
-				.domainName("openapidocs.heoureialwed.com")
+				.create(stack, ApiStack.Config.LogicalIds.CloudfronDistubutionCertificate)
+				.domainName(ApiStack.Config.DNS.docsRecord + "." + ApiStack.Config.DNS.ROOT)
 				.validation(CertificateValidation.fromDns(stack.getHostedZone())).build();
 
 		CloudFrontWebDistribution cloudFrontWebDistribution = CloudFrontWebDistribution.Builder
@@ -104,7 +104,7 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
 				.viewerCertificate(ViewerCertificate.fromAcmCertificate(certificate)).build();
 
 		ARecord.Builder.create(stack, "aRecordcfds").zone(stack.getHostedZone())
-				.recordName("openapidocs")
+				.recordName(ApiStack.Config.DNS.docsRecord)
 				.target(RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontWebDistribution)))
 				.build();
 

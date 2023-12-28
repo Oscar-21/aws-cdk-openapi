@@ -27,26 +27,26 @@ public class BlogApiGatewayEndpoints {
 
 	public void build(ApiStack stack) {
 		
-		IHostedZone hostedZone = HostedZone.fromLookup(stack, ApiStack.LogicalIds.APIGatewayResources.ImportedHostedZone, HostedZoneProviderProps.builder()
-		         .domainName("heoureialwed.com")
+		IHostedZone hostedZone = HostedZone.fromLookup(stack, ApiStack.Config.LogicalIds.ImportedHostedZone, HostedZoneProviderProps.builder()
+		         .domainName(ApiStack.Config.DNS.ROOT)
 		         .build());
 		
 		stack.setHostedZone(hostedZone);
 		
-		 Certificate certificate = Certificate.Builder.create(stack, ApiStack.LogicalIds.APIGatewayResources.APIGatewayCertificate)
-           .domainName("openapiblog.heoureialwed.com")
+		 Certificate certificate = Certificate.Builder.create(stack, ApiStack.Config.LogicalIds.APIGatewayCertificate)
+		   .domainName(ApiStack.Config.DNS.apiRecord + "." + ApiStack.Config.DNS.ROOT)
            .validation(CertificateValidation.fromDns(stack.getHostedZone()))
           .build();
 		 
 		DomainNameOptions domainNameOptions = DomainNameOptions.builder()
-							.domainName("openapiblog.heoureialwed.com")
+							.domainName(ApiStack.Config.DNS.apiRecord + "." + ApiStack.Config.DNS.ROOT)
 				    		.endpointType(EndpointType.REGIONAL)
 				    		.certificate(certificate)
 				    		.build();
 		
 		    
 		
-		Asset openAPIAsset = Asset.Builder.create(stack, ApiStack.LogicalIds.APIGatewayResources.OpenAPIBlogAsset).path("../app/api-docs/openapi.yaml").build();
+		Asset openAPIAsset = Asset.Builder.create(stack, ApiStack.Config.LogicalIds.OpenAPIBlogAsset).path("../app/api-docs/openapi.yaml").build();
 
 		Map<String, String> transformMap = new HashMap<String, String>();
 		transformMap.put("Location", openAPIAsset.getS3ObjectUrl());
@@ -57,7 +57,7 @@ public class BlogApiGatewayEndpoints {
 		InlineApiDefinition apiDefinition = AssetApiDefinition.fromInline(data);
 	
 
-		SpecRestApi restAPI = SpecRestApi.Builder.create(stack, ApiStack.LogicalIds.APIGatewayResources.OpenAPIBlogRestAPI).apiDefinition(apiDefinition)
+		SpecRestApi restAPI = SpecRestApi.Builder.create(stack, ApiStack.Config.LogicalIds.OpenAPIBlogRestAPI).apiDefinition(apiDefinition)
 				.restApiName("OpenAPIBlogWidgetAPI")
 				.endpointExportName("OpenAPIBlogWidgetRestApiEndpoint")
 				.domainName(domainNameOptions)
@@ -70,9 +70,9 @@ public class BlogApiGatewayEndpoints {
 				.build();
 		
 	
-		 ARecord aRecord = ARecord.Builder.create(stack, ApiStack.LogicalIds.APIGatewayResources.OpenAPIDNSForAPIGateway)
+		 ARecord aRecord = ARecord.Builder.create(stack, ApiStack.Config.LogicalIds.OpenAPIDNSForAPIGateway)
 		 	.zone(stack.getHostedZone())
-		 	.recordName("openapiblog")
+		 	.recordName(ApiStack.Config.DNS.apiRecord)
 		 	.target(RecordTarget.fromAlias(new ApiGateway(restAPI)))
 		 	.build();
 		 
