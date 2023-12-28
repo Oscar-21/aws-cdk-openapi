@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   version: "1.0.3"
   title: Nymbl AWS Costs API
@@ -16,18 +16,25 @@ paths:
       x-amazon-apigateway-integration:
         type: mock
         requestTemplates:
-          application/json:
-            statusCode: 200
+          application/json: '{"statusCode": 200}'
         responses:
           default:
             statusCode: 200
             responseParameters:
-              gatewayresponse.header.Access-Control-Allow-Headers: Content-Type,X-Amz-Date,X-Api-Key
-              gatewayresponse.header.Access-Control-Allow-Methods: OPTIONS,POST,GET 
-              gatewayresponse.header.Access-Control-Allow-Origin: '*'
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
-              application/json:
-                statusCode: 200
+              application/json: ''
+      methodResponses:
+        - statusCode: 200
+          responseModels:
+            application/json: 'Empty'
+          responseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+            
     get: 
       summary: Get AWSCostsByAllAccounts.
       description: Costs for all aws accounts, separated by internal and external accounts.
@@ -83,18 +90,24 @@ paths:
       x-amazon-apigateway-integration:
         type: mock
         requestTemplates:
-          application/json:
-            statusCode: 200
+          application/json: '{"statusCode": 200}'
         responses:
           default:
             statusCode: 200
             responseParameters:
-              gatewayresponse.header.Access-Control-Allow-Headers: Content-Type,X-Amz-Date,X-Api-Key
-              gatewayresponse.header.Access-Control-Allow-Methods: OPTIONS,POST,GET 
-              gatewayresponse.header.Access-Control-Allow-Origin: '*'
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,X-Api-Key'"
+              method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:
-              application/json:
-                statusCode: 200
+              application/json: ''
+      methodResponses:
+        - statusCode: 200
+          responseModels:
+            application/json: 'Empty'
+          responseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
     get:
       summary: Server heartbeat operation
       description: >-
