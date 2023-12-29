@@ -1,4 +1,4 @@
-package blog.openapi.app;
+package blog.openapi.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

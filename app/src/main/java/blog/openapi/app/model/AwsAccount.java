@@ -1,4 +1,4 @@
-package blog.openapi.app;
+package blog.openapi.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,13 +12,18 @@ public class AwsAccount {
   private String name;
 
   private Double cost;
+  private Boolean isInternal;
+  private TimePeriod timePeriod;
 
   public AwsAccount() {}
 
-  public AwsAccount(String accountId, String name, Double cost) {
+  public AwsAccount(String accountId, String name, Double cost, Boolean isInternal,
+      TimePeriod timePeriod) {
     this.accountId = accountId;
     this.name = name;
     this.cost = cost;
+    this.isInternal = isInternal;
+    this.timePeriod = timePeriod;
   }
 
   public String getAccountId() {
@@ -41,8 +46,24 @@ public class AwsAccount {
     return cost;
   }
 
+  public void setIsInternal(Boolean isInternal) {
+    this.isInternal = isInternal;
+  }
+
+  public Boolean getIsInternal() {
+    return isInternal;
+  }
+
   public void setCost(Double cost) {
     this.cost = cost;
+  }
+
+  public void setTimePeriod(TimePeriod timePeriod) {
+    this.timePeriod = timePeriod;
+  }
+
+  public TimePeriod getTimePeriod() {
+    return timePeriod;
   }
 
   @Override

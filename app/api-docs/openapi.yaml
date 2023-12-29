@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   version: "1.0.3"
-  title: NymblAWSCostAPI
+  title: Nymbl AWS Cost API
   description: |
     # Introduction
     This API is documented in **OpenAPI format**.
@@ -20,7 +20,7 @@ info:
 
     # Authentication
 
-    NymblAwsCostApi offers one form of authentication:
+    Nymbl Aws Cost API offers one form of authentication:
       - API Key
     <SecurityDefinitions />
 
@@ -40,19 +40,22 @@ externalDocs:
   url: 'https://todo.com'
 
 tags:
-  - name: AWS Monthly Cost By Client
-    description: Operations about monthly costs
   - name: aws_account_cost
-    x-displayName: The AwsAccountCost Model
+    x-displayName: Nymbl Aws Costs By Account
     description: |
-      <SchemaDefinition schemaRef="#/components/schemas/AwsCostsByAllAccounts" />
+      <SchemaDefinition schemaRef="#/components/schemas/AwsCostByAccounts" />
+  - name: aws_account_cost_single
+    x-displayName: A Single AWS Account Cost Record
+    description: |
+      <SchemaDefinition schemaRef="#/components/schemas/AwsAccountCost" />
 x-tagGroups:
   - name: General
     tags:
-      - AWS Monthly Cost By Client
+      - aws_account_cost
   - name: Models
     tags:
       - aws_account_cost
+      - aws_account_cost_single
 
 paths:
   /cost/accounts:
@@ -90,8 +93,8 @@ paths:
       security:
         - api_key: []
       tags:
-        - AWS Monthly Cost By Client
-      summary: Get AWSCostsByAllAccounts.
+        - aws_account_cost
+      summary: Total AWS Costs By Account.
       description: Costs for all aws accounts, separated by internal and external accounts.
       operationId: getAWSCostsByAllAccounts
       parameters:
@@ -102,7 +105,7 @@ paths:
           schema:
             type: string
             format: date
-            description: start date in YYYY-MM format
+            description: start date in yyyy-MM format
             example: 2023-04
         - name: end
           in: query
@@ -111,11 +114,11 @@ paths:
           schema:
             type: string
             format: date
-            description: start date in YYYY-MM format
+            description: start date in yyyy-MM format
             example: 2023-05
       responses:
         '200':
-          $ref: '#/components/responses/AwsCostsByAllAccounts'
+          $ref: '#/components/responses/AwsAccountCostResponse'
       x-amazon-apigateway-integration:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APILambda.Arn}/invocations"
@@ -124,7 +127,7 @@ paths:
         type: "aws_proxy"
     post:
       tags:
-        - AWS Monthly Cost By Client
+        - aws_account_cost
       summary: Create Aws Account Cost Records for a single month
       description: >-
         Endpoint to be used by dynamodb to cache the cost explorer api requests.
@@ -132,7 +135,7 @@ paths:
         stored data via the '/cost/accounts' endpoint.
       operationId: createSingleMonthAwsAccountCostRecord
       requestBody:
-        $ref: '#/components/requestBodies/AwsOneMonthSingleAccountCosts'
+        $ref: '#/components/requestBodies/AwsAccountCostRequest'
       responses:
         '201':
           description: Created
@@ -185,22 +188,21 @@ paths:
 
 components:
   requestBodies:
-    AwsOneMonthSingleAccountCosts:
+    AwsAccountCostRequest:
       description: A list of single accounts and their cost for a single month/year combination.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AwsSingleAccountCostsRequest'
+            $ref: '#/components/schemas/AwsCostByAccounts'
   responses:
-    AwsCostsByAllAccounts:
+    AwsAccountCostResponse:
       description: OK
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AwsCostsByAllAccounts'
+            $ref: '#/components/schemas/AwsCostByAccounts'
   schemas:
-
-    DateSelectionYearRequired:
+    MonthYearSelection:
       type: object
       properties:
         year:
@@ -209,6 +211,7 @@ components:
           example: 2023
         month:
           type: string
+          example: NOVEMBER
           enum:
             - JANUARY
             - FEBRUARY
@@ -222,122 +225,33 @@ components:
             - OCTOBER
             - NOVEMBER
             - DECEMBER
-          example: FEBRUARY
       example:
         year: 2023
-      required:
-        - year
-
-    DateSelectionMonthAndYearRequired:
-      type: object
-      properties:
-        year:
-          type: integer
-          minimum: 2023
-          example: 2024
-        month:
-          type: string
-          example: FEBRUARY
-          enum:
-            - JANUARY
-            - FEBRUARY
-            - MARCH
-            - APRIL
-            - MAY
-            - JUNE
-            - JULY
-            - AUGUST
-            - SEPTEMBER
-            - OCTOBER
-            - NOVEMBER
-            - DECEMBER
-      example:
-        year: 2024
-        month: NOVEMBER
+        month: DECEMBER
       required:
         - year
         - month
 
-    TimePeriodOnlyStartRequired:
+    TimePeriod:
       type: object
       properties:
         start:
-          $ref: '#/components/schemas/DateSelectionYearRequired'
-          example:
-            month: JUNE
-            year: 2023
+          $ref: '#/components/schemas/MonthYearSelection'
         end:
-          $ref: '#/components/schemas/DateSelectionYearRequired'
-          example:
-            month: JULY
-            year: 2023
-      required:
-        - start
-      example:
-        start:
-          year: 2023
-
-    TimePeriodStartAndEndRequired:
-      type: object
-      properties:
-        start:
-          $ref: '#/components/schemas/DateSelectionYearRequired'
-        end:
-          $ref: '#/components/schemas/DateSelectionYearRequired'
+          $ref: '#/components/schemas/MonthYearSelection'
       required:
         - start
         - end
       example:
         start:
           year: 2023
+          month: JUNE
         end:
-          year: 2024
-          month: APRIL
+          year: 2023
+          month: JULY
 
 
-    AwsSingleAccountCost:
-      type: object
-      properties:
-        accountId:
-          type: string
-          example: "123456789012"
-        name:
-          type: string
-          example: "Acme Inc"
-        cost:
-          type: number
-          example: 344.55
-        timePeriod:
-          $ref: '#/components/schemas/TimePeriodStartAndEndRequired'
-          example:
-            start:
-              year: 2023,
-              month: OCTOBER
-            end:
-              year: 2023,
-              month: NOVEMBER
-      required:
-        - accountId
-        - name
-        - cost
-        - timePeriod
-      example: {
-        "accountId": "1234567",
-        "name": "Foo",
-        "cost": 33.21,
-        "timePeriod": {
-          "start": {
-            "year": 2023,
-            "month": "OCTOBER"
-          },
-          "end": {
-            "year": 2023,
-            "month": "NOVEMBER"
-          }
-        }
-      }
-
-    AwsSingleAccountCostWithoutTimePeriod:
+    AwsAccountCost:
       type: object
       properties:
         accountId:
@@ -345,97 +259,56 @@ components:
           example: 123456789012
         name:
           type: string
-          example: Nymbl
+          example: Acme Inc
         cost:
           type: number
-          example: 3214.32
+          example: 344.55
+        isInternal:
+          type: boolean
+        timePeriod:
+          $ref: '#/components/schemas/TimePeriod'
+          example:
+            start:
+              year: 2023
+              month: OCTOBER
+            end:
+              year: 2023
+              month: NOVEMBER
       required:
         - accountId
         - name
         - cost
-      example: {
-        "accountId": "1234567",
-        "name": "Foo",
-        "cost": 33.21,
-      }
+        - timePeriod
+        - isInternal
+      example:
+        accountId: 1234567
+        name: Foo
+        cost: 33.21
+        isInternal: true
+        timePeriod:
+          start:
+            year: 2023
+            month: OCTOBER
+          end:
+            year: 2023
+            month: NOVEMBER
 
-    AwsSingleAccountCostsRequest:
-      type: object
-      properties:
-        accounts:
-          type: array
-          items:
-            $ref: '#/components/schemas/AwsSingleAccountCostWithoutTimePeriod'
-          uniqueItems: true
-        monthYearSelection:
-          $ref: '#/components/schemas/DateSelectionMonthAndYearRequired'
-      example: {
-        "accounts": [
-          {
-            "accountId": "1234567",
-            "name": "Foo",
-            "cost": 33.21,
-          },
-          {
-            "accountId": "1234567",
-            "name": "Foo",
-            "cost": 33.21,
-          }
-        ],
-        "monthYearSelection": {
-          "year": 2023,
-          "month": "OCTOBER"
-        }
-      }
-
-    AwsSingleAccountCostList:
-      type: array
-      items:
-        $ref: '#/components/schemas/AwsSingleAccountCost'
-      uniqueItems: true
-      example: [
-        {
-          "accountId": "1234567",
-          "name": "Foo",
-          "cost": 33.21,
-          "timePeriod": {
-            "start": {
-              "year": 2023,
-              "month": "OCTOBER"
-            },
-            "end": {
-              "year": 2023,
-              "month": "NOVEMBER"
-            }
-          }
-        },
-        {
-          "accountId": "1234567373879",
-          "name": "Bar",
-          "cost": 1113.21,
-          "timePeriod": {
-            "start": {
-              "year": 2023,
-              "month": "OCTOBER"
-            },
-            "end": {
-              "year": 2023,
-              "month": "NOVEMBER"
-            }
-          }
-        }
-      ]
-
-    AwsCostsByAllAccounts:
+    AwsCostByAccounts:
       type: object
       properties:
         timePeriod:
-          $ref: '#/components/schemas/TimePeriodOnlyStartRequired'
+          $ref: '#/components/schemas/TimePeriod'
         accounts:
-          $ref: '#/components/schemas/AwsSingleAccountCostList'
+          type: array
+          items: 
+            $ref: '#/components/schemas/AwsAccountCost'
       example:
         timePeriod:
           start:
+            month: JANUARY
+            year: 2023
+          end:
+            month: DECEMBER
             year: 2023
         accounts:
           - accountId: '1234567'
@@ -449,7 +322,7 @@ components:
               end:
                 year: 2023
                 month: NOVEMBER
-          - accountId: '13389343987'
+          - accountId: 13389343987
             name: Bar
             cost: 822.21
             isInternal: true
