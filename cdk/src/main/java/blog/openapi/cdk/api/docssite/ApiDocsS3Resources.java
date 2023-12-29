@@ -1,6 +1,5 @@
 package blog.openapi.cdk.api.docssite;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,6 +28,7 @@ import software.amazon.awscdk.services.cloudfront.OriginAccessIdentity;
 import software.amazon.awscdk.services.cloudfront.S3OriginConfig;
 import software.amazon.awscdk.services.cloudfront.SourceConfiguration;
 import software.amazon.awscdk.services.cloudfront.ViewerCertificate;
+import software.amazon.awscdk.services.cloudfront.ViewerCertificateOptions;
 import software.amazon.awscdk.services.route53.ARecord;
 import software.amazon.awscdk.services.route53.RecordTarget;
 import software.amazon.awscdk.services.route53.targets.CloudFrontTarget;
@@ -36,6 +36,10 @@ import software.amazon.awscdk.services.certificatemanager.Certificate;
 import software.amazon.awscdk.services.certificatemanager.CertificateValidation;
 
 public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
+ 
+  private final String ALIAS_RECORD = ApiStack.Config.DNS.docsRecord;
+  private final String DOMAIN_ROOT = ApiStack.Config.DNS.ROOT;
+  private final String SITE_DOMAIN = ALIAS_RECORD + "." + DOMAIN_ROOT;
 
   @Override
   public void buildImage(ApiStack stack) {
@@ -79,26 +83,26 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
     OriginAccessIdentity oai = OriginAccessIdentity.Builder.create(stack, "OpenAPIBlogWidgetAPIOAI")
         .comment("OAI for the OpenAPI Blog Widget API Document Website").build();
 
-    S3OriginConfig s3OriginConfig =
-        S3OriginConfig.builder().s3BucketSource(webBucket).originAccessIdentity(oai).build();
 
     webBucket.grantRead(oai);
 
-    List<SourceConfiguration> cloudFrontConfigs = new ArrayList<SourceConfiguration>();
-    cloudFrontConfigs.add(SourceConfiguration.builder().s3OriginSource(s3OriginConfig)
-        .behaviors(Arrays.asList(Behavior.builder().isDefaultBehavior(true).build())).build());
-
     Certificate certificate = Certificate.Builder
         .create(stack, ApiStack.Config.LogicalIds.CloudfronDistubutionCertificate)
-        .domainName(ApiStack.Config.DNS.docsRecord + "." + ApiStack.Config.DNS.ROOT)
+        .domainName(SITE_DOMAIN)
         .validation(CertificateValidation.fromDns(stack.getHostedZone())).build();
 
+    ViewerCertificate viewerCertificate = ViewerCertificate.fromAcmCertificate(
+        certificate,
+        ViewerCertificateOptions.builder()
+            .aliases(Arrays.asList(SITE_DOMAIN))
+            .build());
+            
     CloudFrontWebDistribution cloudFrontWebDistribution = CloudFrontWebDistribution.Builder
-        .create(stack, "OpenAPIBlogCFD").originConfigs(cloudFrontConfigs)
-        .viewerCertificate(ViewerCertificate.fromAcmCertificate(certificate)).build();
-
+        .create(stack, "OpenAPIBlogCFD").originConfigs(getCloudfronConfig(webBucket, oai))
+        .viewerCertificate(viewerCertificate).build();
+    
     ARecord.Builder.create(stack, "aRecordcfds").zone(stack.getHostedZone())
-        .recordName(ApiStack.Config.DNS.docsRecord)
+        .recordName(ALIAS_RECORD)
         .target(RecordTarget.fromAlias(new CloudFrontTarget(cloudFrontWebDistribution))).build();
 
     BucketDeployment bucketDeployment = BucketDeployment.Builder
@@ -119,6 +123,20 @@ public class ApiDocsS3Resources extends AbstractCustomLambdaRuntime<ApiStack> {
         CfnOutput.Builder.create(stack, "OpenAPIBlogCloudFrontDistributionID")
             .value(cloudFrontWebDistribution.getDistributionId()).build());
 
+  }
+  
+  private List<SourceConfiguration> getCloudfronConfig(Bucket webBucket, OriginAccessIdentity oai) {
+    
+    S3OriginConfig s3OriginConfig =
+        S3OriginConfig.builder().s3BucketSource(webBucket).originAccessIdentity(oai).build();
+    
+        SourceConfiguration s3SourceConfig = SourceConfiguration.builder()
+            .s3OriginSource(s3OriginConfig)
+            .behaviors(Arrays.asList(Behavior.builder().isDefaultBehavior(true).build()))
+            .build();
+    
+        return List.of(s3SourceConfig);
+        
   }
 
 }
