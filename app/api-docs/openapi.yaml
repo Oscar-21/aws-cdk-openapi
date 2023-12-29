@@ -431,18 +431,17 @@ components:
       properties:
         timePeriod:
           $ref: '#/components/schemas/TimePeriodOnlyStartRequired'
-        internal:
-          $ref: '#/components/schemas/AwsSingleAccountCostList'
-        external:
+        accounts:
           $ref: '#/components/schemas/AwsSingleAccountCostList'
       example:
         timePeriod:
           start:
             year: 2023
-        internal:
+        accounts:
           - accountId: '1234567'
             name: Foo
             cost: 33.21
+            isInternal: true
             timePeriod:
               start:
                 year: 2023
@@ -453,6 +452,7 @@ components:
           - accountId: '13389343987'
             name: Bar
             cost: 822.21
+            isInternal: true
             timePeriod:
               start:
                 year: 2023
@@ -460,10 +460,10 @@ components:
               end:
                 year: 2023
                 month: NOVEMBER
-        external:
           - accountId: '1234567'
             name: SomeOtherAccount
             cost: 33.21
+            isInternal: false
             timePeriod:
               start:
                 year: 2023
@@ -473,6 +473,7 @@ components:
                 month: NOVEMBER
           - accountId: '13389343987'
             name: ExternalAccountBar
+            isInternal: false
             cost: 822.21
             timePeriod:
               start:
