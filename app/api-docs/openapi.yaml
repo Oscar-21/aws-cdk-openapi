@@ -1,18 +1,66 @@
 openapi: 3.0.1
 info:
   version: "1.0.3"
-  title: Nymbl AWS Costs API
-  description: >-
-    You can use this API to get an aggregation of the internal and external account costs
-    for Nymbl's AWS Accounts.
+  title: NymblAWSCostAPI
+  description: |
+    # Introduction
+    This API is documented in **OpenAPI format**.
+
+    ## How the data is stored and retrieved.
+    The **AWS CostExplorer** API is quite expensive. So instead of exposing endpoints directly we
+    store the data in DynamoDB and update it monthly.
+
+    # Monthly Cost Reporting
+    This **/costs/accounts** will return either all monthly costs separated by internal and external account.
+    Or it will return  subsection based off the start and end dates in the request
+
+    ## Scheduled Updates
+    This API exposes an endpoint to update the cost records. This is only used internally via an **AWS EventBridge Scheduled Event**.
+    It will update for the previous month on the 8th of every month.
+
+    # Authentication
+
+    NymblAwsCostApi offers one form of authentication:
+      - API Key
+    <SecurityDefinitions />
+
+  contact:
+    name: API Support
+    email: austin@nymbl.app
+    url: https://todo.com
+
+  x-logo:
+    url: 'https://assets-global.website-files.com/635aa29ce589b950d718bcf0/6362c908be834825c61adf33_nymbl.png'
+    altText: Nymbl logo
 servers:
   - url: https://openapiblog.heoureialwed.com
-#externalDocs:
-#  description: Nymbl AWS Costs API Git repository
-#  url: TODO
+
+externalDocs:
+  description: Private Repo for the API Code.
+  url: 'https://todo.com'
+
+tags:
+  - name: AWS Monthly Cost By Client
+    description: Operations about monthly costs
+  - name: aws_account_cost
+    x-displayName: The AwsAccountCost Model
+    description: |
+      <SchemaDefinition schemaRef="#/components/schemas/AwsCostsByAllAccounts" />
+x-tagGroups:
+  - name: General
+    tags:
+      - AWS Monthly Cost By Client
+  - name: Models
+    tags:
+      - aws_account_cost
+
 paths:
   /cost/accounts:
     options:
+      security:
+        - api_key: []
+      summary: Options Request for cors configuration
+      description: Preflight request to check cors headers
       responses:
         '200':
           description: CORS support
@@ -39,6 +87,10 @@ paths:
               method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
           
     get: 
+      security:
+        - api_key: []
+      tags:
+        - AWS Monthly Cost By Client
       summary: Get AWSCostsByAllAccounts.
       description: Costs for all aws accounts, separated by internal and external accounts.
       operationId: getAWSCostsByAllAccounts
@@ -71,6 +123,8 @@ paths:
         httpMethod: "POST"
         type: "aws_proxy"
     post:
+      tags:
+        - AWS Monthly Cost By Client
       summary: Create Aws Account Cost Records for a single month
       description: >-
         Endpoint to be used by dynamodb to cache the cost explorer api requests.
@@ -427,3 +481,22 @@ components:
               end:
                 year: 2023
                 month: NOVEMBER
+
+  securitySchemes:
+    #petstore_auth:
+    #  description: |
+    #   Get access to data while protecting your account credentials.
+    #   OAuth2 is also a safer and more secure way to give you access.
+    # type: oauth2
+    # flows:
+    #   implicit:
+    #     authorizationUrl: 'http://petstore.swagger.io/api/oauth/dialog'
+    #     scopes:
+    #       'write:pets': modify pets in your account
+    #       'read:pets': read your pets
+    api_key:
+      description: >
+        An X-Api-Key provided from the API developers to authorized client applications.
+      type: apiKey
+      name: X-Api-Key
+      in: header
