@@ -3,23 +3,27 @@ info:
   version: "1.0.3"
   title: Nymbl AWS Cost API
   description: |
-    # Introduction
-    This API is documented in **OpenAPI format**.
-
-    ## How the data is stored and retrieved.
-    The **AWS CostExplorer** API is quite expensive. So instead of exposing endpoints directly we
-    store the data in DynamoDB and update it monthly.
-
-    # Monthly Cost Reporting
-    This **/costs/accounts** will return either all monthly costs separated by internal and external account.
-    Or it will return  subsection based off the start and end dates in the request
-
-    ## Scheduled Updates
+    ## Using the API
+    #### Get All Cost Records
+    `GET` `/costs/accounts` endpoint with no *query parameters* will return all cost records.
+    <br />
+    <br />
+    #### Get Cost Records starting from a specific `year-month`
+    `GET` `/costs/accounts/?start=2023-10` will return all records from `2023-10` to the most current data.
+    <br />
+    <br />
+    #### Get Cost Records for a single month.
+    `GET` `/costs/accounts/?start=2023-10&end=2023-10` will return all records from `2023-10` to the most current data.
+    <br />
+    <br />
+    ## Creating new Monthly Cost Data Records
+    `POST` `/costs/accounts` is an internal method used to update the cost records store in **DynamoDB**
+    <br />
+    <br />
+    #### Scheduled Updates
     This API exposes an endpoint to update the cost records. This is only used internally via an **AWS EventBridge Scheduled Event**.
     It will update for the previous month on the 8th of every month.
-
     # Authentication
-
     Nymbl Aws Cost API offers one form of authentication:
       - API Key
     <SecurityDefinitions />
