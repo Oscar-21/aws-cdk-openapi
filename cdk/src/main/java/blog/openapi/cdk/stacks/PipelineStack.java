@@ -3,9 +3,16 @@ package blog.openapi.cdk.stacks;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-
+import software.amazon.awscdk.services.codebuild.BuildEnvironment;
+import software.amazon.awscdk.services.codebuild.BuildSpec;
 import software.amazon.awscdk.services.codebuild.Cache;
+import software.amazon.awscdk.services.codebuild.LinuxBuildImage;
 import software.amazon.awscdk.services.codebuild.LocalCacheMode;
+import software.amazon.awscdk.services.codebuild.PipelineProject;
+import software.amazon.awscdk.services.codepipeline.Artifact;
+import software.amazon.awscdk.services.codepipeline.StageOptions;
+import software.amazon.awscdk.services.codepipeline.actions.CodeBuildAction;
+import software.amazon.awscdk.services.codepipeline.actions.CodeStarConnectionsSourceAction;
 import software.constructs.Construct;
 import software.amazon.awscdk.Arn;
 import software.amazon.awscdk.ArnComponents;
@@ -30,6 +37,37 @@ public class PipelineStack extends Stack {
 
 
 		super(scope, id, props);
+		
+		Artifact sourceOutput = new Artifact();
+		CodeStarConnectionsSourceAction sourceAction = CodeStarConnectionsSourceAction.Builder.create()
+		    .actionName("GitHub")
+		    .output(sourceOutput)
+		    .owner("Oscar-21")
+		    .repo(repositoryPath)
+		    .branch(repositoryBranch)
+		    .connectionArn(connectionArn)
+		    .build();
+		
+		PipelineProject project = PipelineProject.Builder.create(this, "MyProject")
+		    .buildSpec(BuildSpec.fromSourceFilename("buildspec.yml")) // points to buildspec file
+		    .environment(BuildEnvironment.builder()
+		        .buildImage(LinuxBuildImage.STANDARD_5_0)
+		        .build()).build();
+		
+		// buildspec.yml
+		/**
+		 * version: 0.2
+		 * phases:
+		 *   build:
+		 *     commands:
+		 *       - echo "$CODEBUILD_WEBHOOK_HEAD_REF" > branchName.txt
+		 *   artifacts:
+		 *     files:
+		 *       - branchName.txt
+		 */
+
+
+		
 
 		/*
 		 *
@@ -39,10 +77,13 @@ public class PipelineStack extends Stack {
 		 * The repositoryPath and repositoryBranch parameters specify the repository and branch to use.
 		 * The connectionArn parameter specifies the ARN of the AWS CodeStar Connections connection.
  		 */
-		CodePipelineSource pipelineSource = CodePipelineSource.connection(repositoryPath, repositoryBranch,
+		
+		CodePipelineSource pipelineSource = CodePipelineSource.connection(
+		    repositoryPath, repositoryBranch,
 				ConnectionSourceOptions.builder()
 						.connectionArn(connectionArn)
 						.build());
+		
 
 		// Synth Caching Support
 		// https://github.com/aws/aws-cdk/issues/13043,
@@ -172,12 +213,29 @@ public class PipelineStack extends Stack {
 //				.cache(Cache.local(LocalCacheMode.DOCKER_LAYER))
 //				.build();
 
-		ApiStackStage apiStackStageDev = new ApiStackStage(this, deployEnvironment, StageProps.builder().env(props.getEnv()).build());
-		pipeline.addStage(apiStackStageDev,
-				AddStageOpts.builder()
-//						.post(Collections.singletonList(codeArtifactStep))
-						.build());
-
+		ApiStackStage apiStackStageDev = new ApiStackStage(
+		    this,
+		    deployEnvironment,
+		    StageProps.builder().env(props.getEnv()).build()
+		);
+		
+		pipeline.addStage(
+		    apiStackStageDev,
+		    AddStageOpts.builder()
+		    // .post(Collections.singletonList(codeArtifactStep))
+		    .build()
+		);
+		
+//		pipeline.addStage(StageOptions.builder()
+//		    .stageName("Build")
+//		    .actions(Arrays.asList(CodeBuildAction.Builder.create()
+//		        .actionName("CodeBuild")
+//		        .project(project)
+//		        .input(sourceOutput)
+//		        .outputs(Arrays.asList(new Artifact("BuildOutput")))
+//		        .build()
+//		    ))
+//		    .build());
 	}
 
 }

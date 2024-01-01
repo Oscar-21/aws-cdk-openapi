@@ -1,0 +1,23 @@
+[
+  {
+    "inputArtifacts": [
+      "An input artifact structure, if supported for the action category"
+    ],
+    "name": "ActionName",
+    "region": "Region",
+    "namespace": "source_namespace",
+    "actionTypeId": {
+      "category": "An action category",
+      "owner": "AWS",
+      "version": "1",
+      "provider": "A provider type for the action category"
+    },
+    "outputArtifacts": [
+      "An output artifact structure, if supported for the action category"
+    ],
+    "configuration": {
+      "<config-keys>": "Configuration details appropriate to the provider type"
+    },
+    "runOrder": "A positive integer that indicates the run order within the stage,"
+  }
+]

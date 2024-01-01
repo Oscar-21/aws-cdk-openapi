@@ -42,8 +42,6 @@ public class BlogApiGatewayEndpoints {
         .domainName(ApiStack.Config.DNS.apiRecord + "." + ApiStack.Config.DNS.ROOT)
         .endpointType(EndpointType.REGIONAL).certificate(certificate).build();
 
-
-
     Asset openAPIAsset = Asset.Builder.create(stack, ApiStack.Config.LogicalIds.OpenAPIBlogAsset)
         .path("../app/api-docs/openapi.yaml").build();
 
